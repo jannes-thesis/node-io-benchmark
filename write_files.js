@@ -16,8 +16,8 @@ async function read_write_delete(path) {
 }
 
 const writes = []
-for (i = 1; i <= 20; i++) {
-    writes.push(read_write_delete('files/file' + i))
+for (i = 1; i <= 30; i++) {
+    writes.push(read_write_delete('/mnt/hdd/files/file' + i))
 }
 
 Promise.all(writes).then(() => console.log('done'))

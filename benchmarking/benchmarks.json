@@ -1,12 +1,12 @@
 {
     "rw_sync_10mb-ssd": {
-        "node_script": "../node_scripts/rw_sync_10mb.js",
+        "node_script": "../node_scripts/rw_sync_10mb.mjs",
         "files_dir": "/ssd2/deno-io-benchmark/files",
-        "amount_files": 200
+        "amount_files": 1000
     },
     "rw_sync_10mb-hdd": {
-        "node_script": "../node_scripts/rw_sync_10mb.js",
+        "node_script": "../node_scripts/rw_sync_10mb.mjs",
         "files_dir": "/hdd/deno-io-benchmark/files",
-        "amount_files": 200
+        "amount_files": 100
     }
 }

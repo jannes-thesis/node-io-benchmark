@@ -1,0 +1,132 @@
+{
+  "results": [
+    {
+      "command": "UV_THREADPOOL_SIZE=1 node ../node_scripts/../node_scripts/rw_sync_10mb.mjs /ssd2/deno-io-benchmark/files 1000",
+      "mean": 85.12841909189835,
+      "stddev": 12.289268589934627,
+      "median": 81.429353599565,
+      "user": 38.648436096666664,
+      "system": 26.459300198333334,
+      "min": 75.113559382565,
+      "max": 98.842344293565,
+      "times": [
+        81.429353599565,
+        75.113559382565,
+        98.842344293565
+      ],
+      "parameter": "1"
+    },
+    {
+      "command": "UV_THREADPOOL_SIZE=2 node ../node_scripts/../node_scripts/rw_sync_10mb.mjs /ssd2/deno-io-benchmark/files 1000",
+      "mean": 73.07994115623167,
+      "stddev": 1.4238077490596739,
+      "median": 73.864501723565,
+      "user": 39.38339709666666,
+      "system": 25.920655531666664,
+      "min": 71.436430660565,
+      "max": 73.938891084565,
+      "times": [
+        71.436430660565,
+        73.938891084565,
+        73.864501723565
+      ],
+      "parameter": "2"
+    },
+    {
+      "command": "UV_THREADPOOL_SIZE=3 node ../node_scripts/../node_scripts/rw_sync_10mb.mjs /ssd2/deno-io-benchmark/files 1000",
+      "mean": 56.63940919423167,
+      "stddev": 0.5047038508391186,
+      "median": 56.622214068565,
+      "user": 40.16922976333333,
+      "system": 27.552692865,
+      "min": 56.143522641565,
+      "max": 57.152490872565,
+      "times": [
+        57.152490872565,
+        56.622214068565,
+        56.143522641565
+      ],
+      "parameter": "3"
+    },
+    {
+      "command": "UV_THREADPOOL_SIZE=4 node ../node_scripts/../node_scripts/rw_sync_10mb.mjs /ssd2/deno-io-benchmark/files 1000",
+      "mean": 54.914346510565,
+      "stddev": 0.25978260931151637,
+      "median": 54.830029289565,
+      "user": 41.42104709666666,
+      "system": 28.469128198333333,
+      "min": 54.707196158565,
+      "max": 55.205814083565,
+      "times": [
+        54.830029289565,
+        55.205814083565,
+        54.707196158565
+      ],
+      "parameter": "4"
+    },
+    {
+      "command": "UV_THREADPOOL_SIZE=5 node ../node_scripts/../node_scripts/rw_sync_10mb.mjs /ssd2/deno-io-benchmark/files 1000",
+      "mean": 54.343656872565,
+      "stddev": 0.20137788741679188,
+      "median": 54.308420264565,
+      "user": 41.85937509666667,
+      "system": 29.203471198333332,
+      "min": 54.162222822565,
+      "max": 54.560327530565,
+      "times": [
+        54.308420264565,
+        54.162222822565,
+        54.560327530565
+      ],
+      "parameter": "5"
+    },
+    {
+      "command": "UV_THREADPOOL_SIZE=6 node ../node_scripts/../node_scripts/rw_sync_10mb.mjs /ssd2/deno-io-benchmark/files 1000",
+      "mean": 53.80425627889833,
+      "stddev": 0.28483947806315585,
+      "median": 53.956376754565,
+      "user": 40.955401429999995,
+      "system": 29.13791019833333,
+      "min": 53.475652878565,
+      "max": 53.980739203565,
+      "times": [
+        53.475652878565,
+        53.956376754565,
+        53.980739203565
+      ],
+      "parameter": "6"
+    },
+    {
+      "command": "UV_THREADPOOL_SIZE=7 node ../node_scripts/../node_scripts/rw_sync_10mb.mjs /ssd2/deno-io-benchmark/files 1000",
+      "mean": 53.57904388123166,
+      "stddev": 0.2418009557752875,
+      "median": 53.550153514565,
+      "user": 40.82625776333333,
+      "system": 29.237575531666664,
+      "min": 53.352986024565,
+      "max": 53.833992104565,
+      "times": [
+        53.833992104565,
+        53.550153514565,
+        53.352986024565
+      ],
+      "parameter": "7"
+    },
+    {
+      "command": "UV_THREADPOOL_SIZE=8 node ../node_scripts/../node_scripts/rw_sync_10mb.mjs /ssd2/deno-io-benchmark/files 1000",
+      "mean": 53.50545949723166,
+      "stddev": 0.0708755578626988,
+      "median": 53.535566703564996,
+      "user": 41.82206443,
+      "system": 29.695253198333333,
+      "min": 53.424500569565,
+      "max": 53.556311218565,
+      "times": [
+        53.535566703564996,
+        53.424500569565,
+        53.556311218565
+      ],
+      "parameter": "8"
+    }
+  ]
+}

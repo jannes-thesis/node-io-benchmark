@@ -1,0 +1,132 @@
+{
+  "results": [
+    {
+      "command": "UV_THREADPOOL_SIZE=1 node ../node_scripts/../node_scripts/rw_sync_10mb.mjs /hdd/deno-io-benchmark/files 100",
+      "mean": 30.383886613991667,
+      "stddev": 0.9197193639160254,
+      "median": 29.928664928325,
+      "user": 3.5155372433333327,
+      "system": 3.5121179349999996,
+      "min": 29.780556050325,
+      "max": 31.442438863325,
+      "times": [
+        31.442438863325,
+        29.928664928325,
+        29.780556050325
+      ],
+      "parameter": "1"
+    },
+    {
+      "command": "UV_THREADPOOL_SIZE=2 node ../node_scripts/../node_scripts/rw_sync_10mb.mjs /hdd/deno-io-benchmark/files 100",
+      "mean": 29.374112139324996,
+      "stddev": 0.06390074518950849,
+      "median": 29.348042482325,
+      "user": 3.594399243333333,
+      "system": 3.614956935,
+      "min": 29.327367498325,
+      "max": 29.446926437324997,
+      "times": [
+        29.327367498325,
+        29.348042482325,
+        29.446926437324997
+      ],
+      "parameter": "2"
+    },
+    {
+      "command": "UV_THREADPOOL_SIZE=3 node ../node_scripts/../node_scripts/rw_sync_10mb.mjs /hdd/deno-io-benchmark/files 100",
+      "mean": 28.751621730658332,
+      "stddev": 0.3879961104102954,
+      "median": 28.874684914324998,
+      "user": 3.847419576666667,
+      "system": 3.710425601666666,
+      "min": 28.317018334325,
+      "max": 29.063161943325,
+      "times": [
+        29.063161943325,
+        28.317018334325,
+        28.874684914324998
+      ],
+      "parameter": "3"
+    },
+    {
+      "command": "UV_THREADPOOL_SIZE=4 node ../node_scripts/../node_scripts/rw_sync_10mb.mjs /hdd/deno-io-benchmark/files 100",
+      "mean": 29.014472452325,
+      "stddev": 0.5102523318483669,
+      "median": 28.900816395325,
+      "user": 3.9371849099999996,
+      "system": 3.6492946016666665,
+      "min": 28.570631760325,
+      "max": 29.571969201324997,
+      "times": [
+        28.900816395325,
+        29.571969201324997,
+        28.570631760325
+      ],
+      "parameter": "4"
+    },
+    {
+      "command": "UV_THREADPOOL_SIZE=5 node ../node_scripts/../node_scripts/rw_sync_10mb.mjs /hdd/deno-io-benchmark/files 100",
+      "mean": 28.87801398965833,
+      "stddev": 0.23231625396019454,
+      "median": 28.875669996324998,
+      "user": 4.0133385766666665,
+      "system": 3.727472601666666,
+      "min": 28.646878601325,
+      "max": 29.111493371324997,
+      "times": [
+        28.875669996324998,
+        28.646878601325,
+        29.111493371324997
+      ],
+      "parameter": "5"
+    },
+    {
+      "command": "UV_THREADPOOL_SIZE=6 node ../node_scripts/../node_scripts/rw_sync_10mb.mjs /hdd/deno-io-benchmark/files 100",
+      "mean": 29.40531397865833,
+      "stddev": 0.9732841242213802,
+      "median": 29.707558292324997,
+      "user": 4.045599243333333,
+      "system": 3.6563559349999992,
+      "min": 28.316765415324998,
+      "max": 30.191618228324998,
+      "times": [
+        29.707558292324997,
+        28.316765415324998,
+        30.191618228324998
+      ],
+      "parameter": "6"
+    },
+    {
+      "command": "UV_THREADPOOL_SIZE=7 node ../node_scripts/../node_scripts/rw_sync_10mb.mjs /hdd/deno-io-benchmark/files 100",
+      "mean": 29.899217163324995,
+      "stddev": 1.0547320747023747,
+      "median": 29.901533547325,
+      "user": 4.061874909999999,
+      "system": 3.769345935,
+      "min": 28.843328804324997,
+      "max": 30.952789138325,
+      "times": [
+        29.901533547325,
+        30.952789138325,
+        28.843328804324997
+      ],
+      "parameter": "7"
+    },
+    {
+      "command": "UV_THREADPOOL_SIZE=8 node ../node_scripts/../node_scripts/rw_sync_10mb.mjs /hdd/deno-io-benchmark/files 100",
+      "mean": 30.045651602658335,
+      "stddev": 1.9989633481450386,
+      "median": 29.696891985325,
+      "user": 4.171612243333333,
+      "system": 3.7613366016666663,
+      "min": 28.244017870325,
+      "max": 32.196044952324996,
+      "times": [
+        29.696891985325,
+        28.244017870325,
+        32.196044952324996
+      ],
+      "parameter": "8"
+    }
+  ]
+}

@@ -28,7 +28,7 @@ def get_bench_params(name):
 def execute_config(node_script, files_dir, amount_files, output_json):
     run(['sudo', 'clear_page_cache'])
     sleep(1)
-    with Popen(['bash', runscript, node_script, files_dir, amount_files, output_json],
+    with Popen(['bash', runscript, node_script, files_dir, str(amount_files), output_json],
                text=True, stdout=subprocess.PIPE) as proc:
         # while running continously obtain stdout and buffer it
         while proc.poll() is None:
@@ -48,7 +48,7 @@ if __name__ == '__main__':
 
     now = datetime.today().strftime('%Y-%m-%d-%H:%M')
     output_json = f'run-{benchmark_name}-{now}.json'
-    execute_config(b_params.node_script, b_params.files_dir, 
+    execute_config(b_params.node_script, b_params.files_dir,
                    b_params.amount_files, output_json)
 
     print('benchmark done')

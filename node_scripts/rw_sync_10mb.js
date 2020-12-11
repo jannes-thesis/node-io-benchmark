@@ -15,9 +15,11 @@ async function read_write_delete(path) {
     await fs.promises.unlink(path + '-b')
 }
 
+const fileDir = process.argv[2]
+const n = process.argv[3]
 const writes = []
-for (i = 1; i <= 30; i++) {
-    writes.push(read_write_delete('/mnt/hdd/files/file' + i))
+for (i = 1; i <= n; i++) {
+    writes.push(read_write_delete(fileDir + '10mb-' + i + '.txt'))
 }
 
 Promise.all(writes).then(() => console.log('done'))

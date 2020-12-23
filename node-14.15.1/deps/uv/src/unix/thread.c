@@ -213,6 +213,14 @@ int uv_thread_create(uv_thread_t *tid, void (*entry)(void *arg), void *arg) {
   return uv_thread_create_ex(tid, &params, entry, arg);
 }
 
+void uv_thread_set_name(uv_thread_t *tid, char* name) {
+  int ret = pthread_setname_np(*tid, name);
+  if (ret != 0) {
+    printf("could not set name %s, ret val %d\n", name, ret);
+    abort();
+  }
+}
+
 int uv_thread_create_ex(uv_thread_t* tid,
                         const uv_thread_options_t* params,
                         void (*entry)(void *arg),

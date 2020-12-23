@@ -189,6 +189,7 @@ static void init_threads(void) {
   unsigned int i;
   const char* val;
   uv_sem_t sem;
+  char thread_name[25];
 
   nthreads = ARRAY_SIZE(default_threads);
   val = getenv("UV_THREADPOOL_SIZE");
@@ -221,9 +222,12 @@ static void init_threads(void) {
   if (uv_sem_init(&sem, 0))
     abort();
 
-  for (i = 0; i < nthreads; i++)
+  for (i = 0; i < nthreads; i++) {
     if (uv_thread_create(threads + i, worker, &sem))
       abort();
+    sprintf(thread_name, "worker-%d", i);
+    uv_thread_set_name(threads + i, thread_name);
+  }
 
   for (i = 0; i < nthreads; i++)
     uv_sem_wait(&sem);

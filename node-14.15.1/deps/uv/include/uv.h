@@ -1743,6 +1743,7 @@ UV_EXTERN int uv_gettimeofday(uv_timeval64_t* tv);
 typedef void (*uv_thread_cb)(void* arg);
 
 UV_EXTERN int uv_thread_create(uv_thread_t* tid, uv_thread_cb entry, void* arg);
+UV_EXTERN void uv_thread_set_name(uv_thread_t* tid, char* name);
 
 typedef enum {
   UV_THREAD_NO_FLAGS = 0x00,

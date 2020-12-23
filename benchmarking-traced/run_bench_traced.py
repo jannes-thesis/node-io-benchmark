@@ -18,7 +18,7 @@ class BenchmarkParameters:
     node_script: str
     files_dir: str
     amount_files: int
-    amount_threads: int
+    amount_threads: List[int]
 
 
 def get_bench_params(name):
@@ -26,13 +26,13 @@ def get_bench_params(name):
         benchmarks_json = json.load(f)
     b = benchmarks_json[name]
     return BenchmarkParameters(b['node_script'], b['files_dir'], 
-                               int(b['amount_files'], int(b['amount_threads'])))
+                               int(b['amount_files']), b['amount_threads'])
 
 
 def execute_config(node_script, files_dir, amount_files, amount_threads, output_dir):
     run(['sudo', 'clear_page_cache'])
     sleep(1)
-    output_prefix = str(os.path.join([output_dir, f't={amount_threads}']))
+    output_prefix = str(os.path.join(output_dir, f't={amount_threads}'))
     with Popen(['bash', runscript, node_script, files_dir, str(amount_files), str(amount_threads), output_prefix],
                text=True, stdout=subprocess.PIPE) as proc:
         # while running continously obtain stdout and buffer it
@@ -41,7 +41,7 @@ def execute_config(node_script, files_dir, amount_files, amount_threads, output_
             print(out)
 
 
-if __name__ == '__main__'
+if __name__ == '__main__':
     print('dont forget to run \'sudo -v\' before')
     if len(sys.argv) != 2:
         print('usage: ./run_benchmark_traced.py [benchmark name]')

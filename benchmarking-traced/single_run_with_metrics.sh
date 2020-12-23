@@ -5,17 +5,17 @@ amount_files=$3
 amount_threads=$4
 output_prefix=$5
 
-cmd="UV_THREADPOOL_SIZE=${amount_threads} nohup ../node_original ../node_scripts/${node_script} ${files_dir} ${amount_files}"
+cmd="nohup ../node_original ../node_scripts/${node_script} ${files_dir} ${amount_files}"
 
 sudo -v
-start_millis=`date +%s%3N`
+start_millis=`date +%s%3N` 
+export UV_THREADPOOL_SIZE=${amount_threads}
 $cmd > /dev/null 2> /dev/null < /dev/null &
-staprun_pid=$!
 main_pid=$!
 echo "benchmark exe pid: ${main_pid}"
-sleep 2
+sleep 1
 # get threads of workers
-worker_tids=$(./get_child_tids.sh threadpool worker-)
+worker_tids=$(./get_child_tids.sh node_original worker-)
 echo "workers: ${worker_tids}"
 
 set -m

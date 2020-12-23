@@ -14,3 +14,4 @@
 ## dependencies
 
 - https://github.com/nodejs/node/blob/master/BUILDING.md
+- systemtap module topsysm2 should be in benchmarking-traced folder

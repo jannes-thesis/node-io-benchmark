@@ -1,8 +1,8 @@
 {
     "test-ssd": {
         "node_script": "../node_scripts/rw_sync_10mb.js",
-        "io_threads": [ 1, 4, 8],
+        "amount_threads": [ 1, 4, 8],
         "files_dir": "/ssd2/deno-io-benchmark/files",
-        "amount_files": 200
+        "amount_files": 200 
     }
 }

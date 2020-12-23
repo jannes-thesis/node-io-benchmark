@@ -20,12 +20,17 @@
  */
 
 #include "uv-common.h"
+#include "adapter.h"
 
 #if !defined(_WIN32)
 # include "unix/internal.h"
 #endif
 
 #include <stdlib.h>
+
+#include <unistd.h>
+#include <syscall.h>
+#include <time.h>
 
 #define MAX_THREADPOOL_SIZE 1024
 
@@ -35,12 +40,14 @@ static uv_mutex_t mutex;
 static unsigned int idle_threads;
 static unsigned int slow_io_work_running;
 static unsigned int nthreads;
-static uv_thread_t* threads;
-static uv_thread_t default_threads[4];
+static unsigned int wq_size;
+static uv_thread_t thread_handle_dummy;
 static QUEUE exit_message;
 static QUEUE wq;
 static QUEUE run_slow_work_message;
 static QUEUE slow_io_pending_wq;
+static QUEUE clone_command;
+static QUEUE terminate_command;
 
 static unsigned int slow_work_thread_threshold(void) {
   return (nthreads + 1) / 2;
@@ -50,21 +57,60 @@ static void uv__cancelled(struct uv__work* w) {
   abort();
 }
 
+/* must hold mutex when calling */
+/* command must be terminate/clone command as defined above */
+static void push_commands(size_t n, QUEUE *command) {
+  size_t i;
+  uv_mutex_lock(&mutex);
+  for (i = 0; i < n; i++) {
+    QUEUE_INSERT_HEAD(&wq, command);
+    wq_size += 1;
+  }
+  if (idle_threads > 0)
+    uv_cond_signal(&cond);
+  uv_mutex_unlock(&mutex);
+}
+
+/* must hold mutex when calling */
+static void check_scaling() {
+    int to_scale = get_scaling_advice(wq_size);
+    if (to_scale != 0) {
+        printf("scale advice: %d\n", to_scale);
+        if (nthreads + to_scale <= 0) {
+          to_scale = 1 - nthreads;
+        }
+        else if (nthreads + to_scale > MAX_THREADPOOL_SIZE) {
+          to_scale = MAX_THREADPOOL_SIZE - nthreads;
+        }
+        if (to_scale < 0) {
+          push_commands(-to_scale, &terminate_command);
+        } else {
+          push_commands(to_scale, &clone_command);
+        }
+    } 
+}
 
 /* To avoid deadlock with uv_cancel() it's crucial that the worker
  * never holds the global mutex and the loop-local mutex at the same time.
  */
 static void worker(void* arg) {
   struct uv__work* w;
+  struct timespec ts;
+  int cond_ret;
   QUEUE* q;
   int is_slow_work;
+  pid_t worker_tid = syscall(__NR_gettid);
+  add_tracee(worker_tid);
 
-  uv_sem_post((uv_sem_t*) arg);
+  if (arg != NULL)
+    uv_sem_post((uv_sem_t*) arg);
   arg = NULL;
 
   uv_mutex_lock(&mutex);
+  nthreads += 1;
   for (;;) {
     /* `mutex` should always be locked at this point. */
+    check_scaling();
 
     /* Keep waiting while either no work is present or only slow I/O
        and we're at the threshold for that. */
@@ -73,19 +119,52 @@ static void worker(void* arg) {
             QUEUE_NEXT(&run_slow_work_message) == &wq &&
             slow_io_work_running >= slow_work_thread_threshold())) {
       idle_threads += 1;
-      uv_cond_wait(&cond, &mutex);
+      for (;;) {
+        check_scaling();
+        clock_gettime(CLOCK_REALTIME, &ts);
+        ts.tv_sec += 1;
+        printf("wait for mutex\n");
+        cond_ret = pthread_cond_timedwait(&cond, &mutex, &ts);
+        printf("waited for mutex\n");
+        if (cond_ret == ETIMEDOUT) {
+          uv_mutex_lock(&mutex);
+          continue;
+        }
+        if (cond_ret != 0)
+          abort();
+        else
+          break;
+      } 
       idle_threads -= 1;
     }
 
     q = QUEUE_HEAD(&wq);
     if (q == &exit_message) {
-      uv_cond_signal(&cond);
-      uv_mutex_unlock(&mutex);
+      printf("worker exit\n");
       break;
     }
 
     QUEUE_REMOVE(q);
+    wq_size -= 1;
     QUEUE_INIT(q);  /* Signal uv_cancel() that the work req is executing. */
+
+    if (q == &clone_command) {
+      if (nthreads < MAX_THREADPOOL_SIZE)
+      {
+        printf("worker clone\n");
+        nthreads += 1;
+        uv_thread_create(&thread_handle_dummy, worker, NULL);
+      }
+      continue;
+    }
+
+    if (q == &terminate_command) {
+      if (nthreads > 1) {
+        printf("worker terminate\n");
+        break;
+      }
+      continue;
+    }
 
     is_slow_work = 0;
     if (q == &run_slow_work_message) {
@@ -93,6 +172,7 @@ static void worker(void* arg) {
          other work in the queue is done. */
       if (slow_io_work_running >= slow_work_thread_threshold()) {
         QUEUE_INSERT_TAIL(&wq, q);
+        wq_size += 1;
         continue;
       }
 
@@ -136,6 +216,10 @@ static void worker(void* arg) {
       slow_io_work_running--;
     }
   }
+  nthreads -= 1;
+  remove_tracee(worker_tid);
+  uv_cond_signal(&cond);
+  uv_mutex_unlock(&mutex);
 }
 
 
@@ -154,6 +238,7 @@ static void post(QUEUE* q, enum uv__work_kind kind) {
   }
 
   QUEUE_INSERT_TAIL(&wq, q);
+  wq_size += 1;
   if (idle_threads > 0)
     uv_cond_signal(&cond);
   uv_mutex_unlock(&mutex);
@@ -162,50 +247,41 @@ static void post(QUEUE* q, enum uv__work_kind kind) {
 
 void uv__threadpool_cleanup(void) {
 #ifndef _WIN32
-  unsigned int i;
-
   if (nthreads == 0)
     return;
 
+  printf("post exit msg\n");
   post(&exit_message, UV__WORK_CPU);
 
-  for (i = 0; i < nthreads; i++)
-    if (uv_thread_join(threads + i))
-      abort();
-
-  if (threads != default_threads)
-    uv__free(threads);
-
+  printf("wait for workers to finish\n");
+  while (nthreads > 0)
+  {
+    uv_sleep(10);
+  }
+  
+  printf("pool exiting\n");
   uv_mutex_destroy(&mutex);
   uv_cond_destroy(&cond);
-
-  threads = NULL;
-  nthreads = 0;
 #endif
 }
 
 
 static void init_threads(void) {
-  unsigned int i;
-  const char* val;
+  const char* adapter_algo_params;
   uv_sem_t sem;
 
-  nthreads = ARRAY_SIZE(default_threads);
-  val = getenv("UV_THREADPOOL_SIZE");
-  if (val != NULL)
-    nthreads = atoi(val);
-  if (nthreads == 0)
-    nthreads = 1;
-  if (nthreads > MAX_THREADPOOL_SIZE)
-    nthreads = MAX_THREADPOOL_SIZE;
+  nthreads = 0;
+  adapter_algo_params = getenv("ALGO_PARAMS");
+  if (adapter_algo_params == NULL) {
+    printf("missing ALGO_PARAMS!\n");
+    exit(1);
+  }
 
-  threads = default_threads;
-  if (nthreads > ARRAY_SIZE(default_threads)) {
-    threads = uv__malloc(nthreads * sizeof(threads[0]));
-    if (threads == NULL) {
-      nthreads = ARRAY_SIZE(default_threads);
-      threads = default_threads;
-    }
+  if (new_default_adapter(adapter_algo_params)) {
+    printf("adapter init success\n");
+  }
+  else {
+    printf("adapter init fail\n");
   }
 
   if (uv_cond_init(&cond))
@@ -221,13 +297,10 @@ static void init_threads(void) {
   if (uv_sem_init(&sem, 0))
     abort();
 
-  for (i = 0; i < nthreads; i++)
-    if (uv_thread_create(threads + i, worker, &sem))
-      abort();
+  if (uv_thread_create(&thread_handle_dummy, worker, &sem))
+    abort();
 
-  for (i = 0; i < nthreads; i++)
-    uv_sem_wait(&sem);
-
+  uv_sem_wait(&sem);
   uv_sem_destroy(&sem);
 }
 

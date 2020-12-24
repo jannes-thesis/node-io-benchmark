@@ -9,7 +9,7 @@
 ## branches
 
 - master: original node v14.15.1 
-- adpative: node v14.15.1 with adaptive libuv threadpool
+- adaptive: node v14.15.1 with adaptive libuv threadpool
 
 ## dependencies
 
